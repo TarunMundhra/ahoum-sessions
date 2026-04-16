@@ -150,6 +150,7 @@ SITE_ID = 1
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
 
@@ -194,3 +195,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+# EMAIL & ALLAUTH CONFIGURATION
+# Print emails to the terminal instead of trying to send them via SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Allauth settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Set to 'optional' or 'mandatory' in production
