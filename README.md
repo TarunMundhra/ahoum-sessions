@@ -60,7 +60,7 @@ POSTGRES_DB=ahoum_sessions_db
 
 # Google OAuth Credentials
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_SECRET_KEY=your-google-client-secret
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 
 # GitHub OAuth Credentials
 GITHUB_CLIENT_ID=your-github-client-id
@@ -171,7 +171,7 @@ http://127.0.0.1:8000/accounts/google/login/callback/
 
 ```env
 GOOGLE_CLIENT_ID=your-copied-client-id
-GOOGLE_SECRET_KEY=your-copied-client-secret
+GOOGLE_CLIENT_SECRET=your-copied-client-secret
 ```
 
 2. Restart your Docker containers to apply the new environment variables:
@@ -180,14 +180,8 @@ GOOGLE_SECRET_KEY=your-copied-client-secret
 docker compose up -d
 ```
 
-3. Go to the Django Admin panel (`http://localhost:8000/admin`) and log in.
-4. Navigate to **Sites > Sites**. Edit the default `example.com` site:
-   - Domain name: `localhost:8000`
-   - Display name: `Ahoum Sessions`
-
-   Save the changes.
-
-5. The backend is now fully configured to accept Google OAuth tokens and issue JWTs to the React frontend.
+3. The backend is now fully configured to accept Google OAuth tokens and issue JWTs to the React frontend.
+   No Django admin Site configuration is required in this codebase because provider app credentials are loaded from environment variables.
 
 ## 🔐 GitHub OAuth Setup Instructions
 

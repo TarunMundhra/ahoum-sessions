@@ -4,7 +4,10 @@ export const Header = ({ user, onGoogleLogin, onGithubLogin, onLogout }) => {
   return (
     <div className="mb-10 border-b border-gray-200 pb-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-blue-600">Ahoum Sessions 🚀</h1>
+        <div className="flex items-center gap-3">
+          <img src="/hero.svg" alt="Ahoum" className="h-10 w-10" />
+          <h1 className="text-3xl font-bold text-blue-600">Ahoum Sessions</h1>
+        </div>
       
         {user ? (
           <div className="flex flex-wrap items-center gap-3 text-sm font-medium">

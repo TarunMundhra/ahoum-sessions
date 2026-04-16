@@ -61,6 +61,17 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def post(self, request, *args, **kwargs):
+        provider_cfg = settings.SOCIALACCOUNT_PROVIDERS.get('google', {})
+        app_cfg = provider_cfg.get('APP', {})
+        client_id = app_cfg.get('client_id')
+        client_secret = app_cfg.get('secret')
+
+        if not client_id or not client_secret:
+            return Response(
+                {'detail': 'Google OAuth is not configured on the server.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             return super().post(request, *args, **kwargs)
         except OAuth2Error:
@@ -214,3 +225,30 @@ class SafeLogoutView(APIView):
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
+
+
+class BecomeCreatorView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if getattr(user, 'role', None) == 'creator':
+            return Response(
+                {
+                    'detail': 'You are already a creator.',
+                    'user': UserSerializer(user).data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        user.role = 'creator'
+        user.save(update_fields=['role'])
+
+        return Response(
+            {
+                'detail': 'Role upgraded to creator successfully.',
+                'user': UserSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
+        )

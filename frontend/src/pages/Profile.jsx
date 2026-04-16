@@ -30,6 +30,25 @@ const Profile = ({ user }) => {
     },
   });
 
+  const becomeCreatorMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axiosInstance.post('auth/become-creator/');
+      return response.data;
+    },
+    onSuccess: (result) => {
+      if (result?.user) {
+        queryClient.setQueryData(['user'], result.user);
+      }
+      setFeedback({ type: 'success', message: result?.detail || 'You are now a creator.' });
+    },
+    onError: (error) => {
+      setFeedback({
+        type: 'error',
+        message: error?.response?.data?.detail || 'Failed to upgrade role.',
+      });
+    },
+  });
+
   const handleSubmit = (event) => {
     event.preventDefault();
     setFeedback(null);
@@ -110,6 +129,17 @@ const Profile = ({ user }) => {
         >
           {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
         </button>
+
+        {user?.role !== 'creator' && (
+          <button
+            type="button"
+            onClick={() => becomeCreatorMutation.mutate()}
+            disabled={becomeCreatorMutation.isPending}
+            className="ml-3 rounded-lg border border-purple-300 bg-purple-50 px-5 py-2 font-medium text-purple-700 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {becomeCreatorMutation.isPending ? 'Upgrading...' : 'Become Creator'}
+          </button>
+        )}
       </form>
     </div>
   );

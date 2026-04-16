@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
 
     # Local Apps
     'accounts',
@@ -98,20 +99,29 @@ REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserSerializer',
 }
 
-# Google Config (Hardcoded to bypass DB issues)
+# Social OAuth provider config (from environment)
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
-            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
-            'key': ''
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', os.environ.get('GOOGLE_SECRET_KEY', '')),
+            'key': '',
         },
         'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'}
-    }
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'github': {
+        'APP': {
+            'client_id': os.environ.get('GITHUB_CLIENT_ID', ''),
+            'secret': os.environ.get('GITHUB_SECRET_KEY', ''),
+            'key': '',
+        },
+        'SCOPE': ['read:user', 'user:email'],
+    },
 }
 
-SOCIALACCOUNT_STORE_TOKENS = True
+# Required for settings-based APP config: avoids SocialToken lookup using an unsaved SocialApp instance.
+SOCIALACCOUNT_STORE_TOKENS = False
 
 # CORS & CSRF
 CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
