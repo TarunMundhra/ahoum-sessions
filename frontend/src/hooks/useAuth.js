@@ -78,7 +78,7 @@ export const useAuth = () => {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await axiosInstance.get("auth/logout-safe/");
+      await axiosInstance.post("auth/logout-safe/");
     },
     onSuccess: () => {
       setOauthError(null);

@@ -95,7 +95,47 @@ Once the containers are running, you can access the different services at:
 
 - Frontend App: http://localhost:5173
 - Django Admin Panel: http://localhost:8000/admin
-- Backend API Base URL: http://localhost:8000/api/
+- Backend API (via Nginx): http://localhost/api/
+- Backend API (direct Django debug): http://localhost:8000/api/
+
+## 🛡️ Rate Limiting (Nginx)
+
+Rate limiting is implemented at the Nginx edge so abusive bursts are blocked **before** hitting Django.
+
+### Why Nginx-based rate limiting?
+
+- Protects sensitive endpoints from brute-force and abuse.
+- Reduces backend load by rejecting excessive requests early.
+- Keeps policy centralized and easy to tune without app-code changes.
+
+### Applied policy
+
+- `api_general`: `120 requests/minute` per IP (all `/api/` traffic)
+- `auth_sensitive`: `10 requests/minute` per IP with small burst
+  - `/api/auth/google/`
+  - `/api/auth/github/`
+  - `/api/auth/registration/`
+- `booking_sensitive`: `20 requests/minute` per IP with burst
+  - `/api/marketplace/bookings/`
+
+When a limit is exceeded, Nginx returns `429 Too Many Requests`.
+
+### End-to-end procedure used in this project
+
+1. Define Nginx zones in [nginx/nginx.conf](nginx/nginx.conf):
+   - `limit_req_zone $binary_remote_addr ...`
+2. Attach stricter `limit_req` rules to sensitive `location` blocks.
+3. Keep a broader `limit_req` for general `/api/` traffic.
+4. Route frontend API calls through Nginx by default in [frontend/src/api/axios.ts](frontend/src/api/axios.ts):
+   - default base URL: `http://localhost/api/`
+5. Validate and apply config:
+
+```bash
+docker compose exec nginx nginx -t
+docker compose restart nginx
+```
+
+6. Verify limits by burst-testing a sensitive endpoint and checking for `429` responses.
 
 ## 🔐 Google OAuth Setup Instructions
 

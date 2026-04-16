@@ -7,6 +7,7 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth import logout as django_logout
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from dj_rest_auth.registration.views import SocialLoginView
@@ -47,10 +48,13 @@ def _clear_auth_cookies(response):
     auth_settings = getattr(settings, 'REST_AUTH', {})
     access_cookie = auth_settings.get('JWT_AUTH_COOKIE', 'access-token')
     refresh_cookie = auth_settings.get('JWT_AUTH_REFRESH_COOKIE', 'refresh-token')
+    cookie_path = auth_settings.get('JWT_AUTH_COOKIE_PATH', '/')
+    cookie_domain = auth_settings.get('JWT_AUTH_COOKIE_DOMAIN')
 
-    response.delete_cookie(access_cookie)
-    response.delete_cookie(refresh_cookie)
-    response.delete_cookie('csrftoken')
+    response.delete_cookie(access_cookie, path=cookie_path, domain=cookie_domain, samesite='Lax')
+    response.delete_cookie(refresh_cookie, path=cookie_path, domain=cookie_domain, samesite='Lax')
+    response.delete_cookie('sessionid', path='/', samesite='Lax')
+    response.delete_cookie('csrftoken', path='/', samesite='Lax')
 
 
 class GoogleLogin(SocialLoginView):
@@ -201,8 +205,11 @@ class SafeLogoutView(APIView):
     authentication_classes = []
 
     def post(self, request, *args, **kwargs):
+        # Kill Django session-backed auth first, then clear browser cookies.
+        django_logout(request)
         response = Response({'detail': 'Logged out successfully.'}, status=status.HTTP_200_OK)
         _clear_auth_cookies(response)
+        response['Cache-Control'] = 'no-store'
         return response
 
     def get(self, request, *args, **kwargs):
