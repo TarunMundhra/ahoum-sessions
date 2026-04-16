@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export const SessionCard = ({ session, user, onBook, status, isBooking = false }) => {
   const bookingInProgress = status === 'loading' || isBooking;
   const bookingComplete = status === 'success';
@@ -14,6 +16,13 @@ export const SessionCard = ({ session, user, onBook, status, isBooking = false }
           <span className="font-medium text-gray-500">Host: {session.creator_username}</span>
           <span className="font-bold text-green-600 text-lg">${session.price}</span>
         </div>
+
+        <Link
+          to={`/sessions/${session.id}`}
+          className="mb-3 inline-block text-sm font-medium text-blue-600 hover:underline"
+        >
+          View Details
+        </Link>
 
         {/* Dynamic Booking Button */}
         {user ? (

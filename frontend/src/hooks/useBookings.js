@@ -6,7 +6,7 @@ export const useBookings = () => {
 
   return useMutation({
     mutationFn: async (sessionId) => {
-      return await axiosInstance.post("/marketplace/bookings/", {
+      return await axiosInstance.post("marketplace/bookings/", {
         session: sessionId,
       });
     },

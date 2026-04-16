@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from accounts.views import GoogleLogin
+from accounts.views import GoogleLogin, GitHubLogin, SafeLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +26,6 @@ urlpatterns = [
 
     path('api/marketplace/', include('marketplace.urls')),
     path('api/auth/google/', GoogleLogin.as_view(), name='google_login'),
+    path('api/auth/github/', GitHubLogin.as_view(), name='github_login'),
+    path('api/auth/logout-safe/', SafeLogoutView.as_view(), name='logout_safe'),
 ]
