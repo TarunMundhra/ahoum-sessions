@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { Header } from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
-import Marketplace from './pages/marketplace.jsx';
+import ErrorBoundary from './components/ErrorBoundary';
+import Marketplace from './pages/Marketplace.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 
 function App() {
@@ -22,15 +23,17 @@ function App() {
             </div>
           )}
 
-          <Routes>
-            {/* 1. Public Route: Anyone can see the sessions */}
-            <Route path="/" element={<Marketplace user={user} />} />
+          <ErrorBoundary>
+            <Routes>
+              {/* 1. Public Route: Anyone can see the sessions */}
+              <Route path="/" element={<Marketplace user={user} />} />
 
-            {/* 2. Protected Route: Your AuthLayout idea handles access */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard user={user} />} />
-            </Route>
-          </Routes>
+              {/* 2. Protected Route: Your AuthLayout idea handles access */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard user={user} />} />
+              </Route>
+            </Routes>
+          </ErrorBoundary>
 
         </div>
       </div>
